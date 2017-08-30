@@ -24,6 +24,7 @@
   "dependencies": {
     "co": "^4.6.0",
     "ipcheck": "0.1.0",
+    "net": "1.0.2",
     "wildcard": "^1.1.2"
   }
 }
