@@ -1,5 +1,6 @@
 const wildcard = require('wildcard');
 const co = require('co');
+const IPCheck = require('ipcheck');
 
 const PopulationStrategies = {
     'express': {
@@ -33,9 +34,26 @@ const PopulationStrategies = {
             return req.headers['origin'] || '';
         },
         getIpAddress: (req, res) => {
-            return req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        if (ip === '::1') {
+            return '127.0.0.1';
+        }
+        if (net.isIP(ip) === 6) {
+            return ip.substring(7);
+        }
+        return ip;        }
+    }
+}
+
+function checkIp(ipToCheck, ipAddresses) {
+    var ip = new IPCheck(ipToCheck);
+    for (var i = 0; i <= ipAddresses.length; i++) {
+        var whiteListIp = new IPCheck(ipAddresses[i]);
+        if (ip.match(whiteListIp)) {
+            return true;
         }
     }
+    return false;
 }
 
 function compare(pattern, s) {
@@ -61,7 +79,7 @@ function roleschk(uroles, rroles) {
 }
 
 function emptyfn() {
-    return true;
+    return Promise.resolve(true);
 }
 
 module.exports = (config) => {
@@ -94,7 +112,8 @@ module.exports = (config) => {
                 if (rule.paths.find((e) => compare(e, path))) {
                     if (rule.methods.find((e) => compare(e.toUpperCase(), method)) &&
                         rule.origin.find((e) => compare(e, origin)) &&
-                        rule.ipAddresses.find((e) => compare(e, ipAddress)) &&
+                        // rule.ipAddresses.find((e) => compare(e, ipAddress)) &&
+                        checkIp(ipAddress,rule.ipAddresses) &&
                         (!rule.users || rule.users.find((e) => compare(e, email)) || rule.users.find((e) => compare(e, phone))) &&
                         (!rule.roles || roleschk(roles, rule.roles)) &&
                         (undefined === rule.secure || secure == rule.secure) &&

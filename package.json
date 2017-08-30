@@ -23,6 +23,7 @@
   "homepage": "https://github.com/jkyberneees/webfirewall#readme",
   "dependencies": {
     "co": "^4.6.0",
+    "ipcheck": "0.1.0",
     "wildcard": "^1.1.2"
   }
 }
