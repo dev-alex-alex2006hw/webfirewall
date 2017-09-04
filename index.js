@@ -143,7 +143,8 @@ module.exports = (config) => {
                                 console.log('DROPPED');
                                 let err = new Error('Forbidden');
                                 err.status = 403;
-                                next(false);
+                                res.send();
+                                // next(false);
                                 //next(err);
                                 break;
                         }
@@ -163,7 +164,8 @@ module.exports = (config) => {
                     console.log('dropped');
 
                     err.status = 403;
-                    next(false);
+                    res.send();
+                    // next(false);
                     //next(err);
                     break;
             }
