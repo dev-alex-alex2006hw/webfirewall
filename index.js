@@ -1,7 +1,6 @@
 const wildcard = require('wildcard');
 const co = require('co');
 const IPCheck = require('ipcheck');
-const net = require('net');
 
 const PopulationStrategies = {
     'express': {
@@ -35,40 +34,25 @@ const PopulationStrategies = {
             return req.headers['origin'] || '';
         },
         getIpAddress: (req, res) => {
-            var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-            var retVal = ip;
-            if (ip === '::1') {
-                retVal = '127.0.0.1';
-            }
-            if (net.isIP(ip) === 6) {
-                retVal = ip.substring(7);
-            }
-            console.log(retVal);
-            return retVal;
+        var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        if (ip === '::1') {
+            return '127.0.0.1';
         }
+        if (net.isIP(ip) === 6) {
+            return ip.substring(7);
+        }
+        return ip;        }
     }
 }
 
 function checkIp(ipToCheck, ipAddresses) {
-    var ipsToCheck = [];
-    if (ipToCheck.includes(',')) {
-        ipsToCheck = ipToCheck.split(',');
-    } else {
-        ipsToCheck.push(ipToCheck);
-    }
-    console.log('ipsToCheck:' + ipsToCheck);
-    for (var x = 0; x < ipsToCheck.length; x++) {
-        var ip = new IPCheck(ipsToCheck[x].trim());
-        console.log('#' + x + ' - ' + ipsToCheck[x].trim());
-        for (var i = 0; i <= ipAddresses.length; i++) {
-            var whiteListIp = new IPCheck(ipAddresses[i]);
-            if (ip.match(whiteListIp)) {
-                console.log('match');
-                return true;
-            }
+    var ip = new IPCheck(ipToCheck);
+    for (var i = 0; i <= ipAddresses.length; i++) {
+        var whiteListIp = new IPCheck(ipAddresses[i]);
+        if (ip.match(whiteListIp)) {
+            return true;
         }
     }
-    console.log('no match');
     return false;
 }
 
@@ -129,23 +113,21 @@ module.exports = (config) => {
                     if (rule.methods.find((e) => compare(e.toUpperCase(), method)) &&
                         rule.origin.find((e) => compare(e, origin)) &&
                         // rule.ipAddresses.find((e) => compare(e, ipAddress)) &&
-                        checkIp(ipAddress, rule.ipAddresses) &&
+                        checkIp(ipAddress,rule.ipAddresses) &&
                         (!rule.users || rule.users.find((e) => compare(e, email)) || rule.users.find((e) => compare(e, phone))) &&
                         (!rule.roles || roleschk(roles, rule.roles)) &&
                         (undefined === rule.secure || secure == rule.secure) &&
                         (yield rule.handler(req))) {
                         switch (rule.action.toUpperCase()) {
                             case 'ACCEPT':
-                                console.log('ACCEPTED');
                                 next();
                                 break;
                             case 'DROP':
-                                console.log('DROPPED');
-                                let err = new Error('Forbidden');
-                                err.status = 403;
-                                res.send();
-                                // next(false);
-                                //next(err);
+                                // let err = new Error();
+                                // err.statusCode = 410;
+                                res.send(410);
+                                next(false);
+
                                 break;
                         }
 
@@ -156,17 +138,13 @@ module.exports = (config) => {
 
             switch (config.defaultAction) {
                 case 'ACCEPT':
-                    console.log('accepted');
                     next();
                     break;
                 case 'DROP':
-                    let err = new Error('Forbidden');
-                    console.log('dropped');
-
-                    err.status = 403;
-                    res.send();
-                    // next(false);
-                    //next(err);
+                    // let err = new Error();
+                    // err.statusCode = 410;
+                    res.send(410);
+                    next(false);
                     break;
             }
         }).catch(next);
