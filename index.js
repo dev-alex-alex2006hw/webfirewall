@@ -49,6 +49,8 @@ const PopulationStrategies = {
 
 function checkIp(ipToCheck, ipAddresses) {
     var ip = new IPCheck(ipToCheck);
+    console.log('Searching ' + ipToCheck + ' in ' + ipAddresses);
+    
     for (var i = 0; i <= ipAddresses.length; i++) {
         var whiteListIp = new IPCheck(ipAddresses[i]);
         if (ip.match(whiteListIp)) {
