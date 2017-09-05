@@ -54,6 +54,7 @@ function checkIp(ipToCheck, ipAddresses) {
     for (var i = 0; i <= ipAddresses.length; i++) {
         var whiteListIp = new IPCheck(ipAddresses[i]);
         if (ip.match(whiteListIp)) {
+            console.log('I got a match');
             return true;
         }
     }
@@ -124,11 +125,14 @@ module.exports = (config) => {
                         (yield rule.handler(req))) {
                         switch (rule.action.toUpperCase()) {
                             case 'ACCEPT':
+                                console.log('accepted');
                                 next();
                                 break;
                             case 'DROP':
                                 // let err = new Error();
                                 // err.statusCode = 410;
+                                console.log('dropped');
+
                                 res.send(410);
                                 next(false);
 
@@ -143,10 +147,14 @@ module.exports = (config) => {
             switch (config.defaultAction) {
                 case 'ACCEPT':
                     next();
+                    console.log('ACCEPTED');
+
                     break;
                 case 'DROP':
                     // let err = new Error();
                     // err.statusCode = 410;
+                    console.log('DROPPED');
+
                     res.send(410);
                     next(false);
                     break;
