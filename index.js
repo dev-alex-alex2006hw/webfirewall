@@ -100,29 +100,24 @@ module.exports = (config) => {
 
     return function (req, res, next) {
         co(function* () {
-            let getUserEmail = config.getUserEmail || ((req) => Promise.resolve(req.user ? req.user.email : null));
-            let getUserPhone = config.getUserPhone || ((req) => Promise.resolve(req.user ? req.user.phone : null));
-            let getUserRoles = config.getUserRoles || ((req) => Promise.resolve(req.user ? req.user.roles : null));
+            //let getUserEmail = config.getUserEmail || ((req) => Promise.resolve(req.user ? req.user.email : null));
+            //let getUserPhone = config.getUserPhone || ((req) => Promise.resolve(req.user ? req.user.phone : null));
+            //let getUserRoles = config.getUserRoles || ((req) => Promise.resolve(req.user ? req.user.roles : null));
 
             let method = strategy.getMethod(req, res);
             let path = strategy.getPath(req, res);
             let secure = strategy.isSecure(req, res);
             let origin = strategy.getOrigin(req, res);
             let ipAddress = strategy.getIpAddress(req, res);
-            let email = yield getUserEmail(req);
-            let phone = yield getUserPhone(req);
-            let roles = yield getUserRoles(req);
+            //let email = yield getUserEmail(req);
+            //let phone = yield getUserPhone(req);
+            //let roles = yield getUserRoles(req);
 
             for (let rule of config.rules) {
                 if (rule.paths.find((e) => compare(e, path))) {
                     if (rule.methods.find((e) => compare(e.toUpperCase(), method)) &&
                         rule.origin.find((e) => compare(e, origin)) &&
-                        // rule.ipAddresses.find((e) => compare(e, ipAddress)) &&
-                        checkIp(ipAddress,rule.ipAddresses) &&
-                        (!rule.users || rule.users.find((e) => compare(e, email)) || rule.users.find((e) => compare(e, phone))) &&
-                        (!rule.roles || roleschk(roles, rule.roles)) &&
-                        (undefined === rule.secure || secure == rule.secure) &&
-                        (yield rule.handler(req))) {
+                        checkIp(ipAddress,rule.ipAddresses)){
                         switch (rule.action.toUpperCase()) {
                             case 'ACCEPT':
                                 console.log('accepted');
