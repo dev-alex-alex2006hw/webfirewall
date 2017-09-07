@@ -48,16 +48,19 @@ const PopulationStrategies = {
 }
 
 function checkIp(ipToCheck, ipAddresses) {
-    var ip = new IPCheck(ipToCheck);
-    console.log('Searching ' + ipToCheck + ' in ' + ipAddresses);
     
-    for (var i = 0; i <= ipAddresses.length; i++) {
-        var whiteListIp = new IPCheck(ipAddresses[i]);
-        if (ip.match(whiteListIp)) {
-            console.log('I got a match');
-            return true;
+    console.log('Searching ' + ipToCheck + ' in ' + ipAddresses);
+    for(var j=0; j <= ipToCheck.split(",").length; j++){
+        var ip = new IPCheck(ipToCheck.split(",")[j]);
+        for (var i = 0; i <= ipAddresses.length; i++) {
+            var whiteListIp = new IPCheck(ipAddresses[i]);
+            if (ip.match(whiteListIp)) {
+                console.log('I got a match');
+                return true;
+            }
         }
     }
+    
     return false;
 }
 
