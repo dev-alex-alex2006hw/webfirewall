@@ -1,6 +1,7 @@
 const wildcard = require('wildcard');
 const co = require('co');
-const IPCheck = require('ipcheck');
+// const IPCheck = require('ipcheck');
+const CIDRMatcher = require('cidr-matcher');
 const net = require('net');
 
 
@@ -50,17 +51,14 @@ const PopulationStrategies = {
 function checkIp(ipToCheck, ipAddresses) {
     
     console.log('Searching ' + ipToCheck + ' in ' + ipAddresses);
-    for(var j=0; j <= ipToCheck.split(",").length; j++){
-        var ip = new IPCheck(ipToCheck.split(",")[j]);
-        for (var i = 0; i <= ipAddresses.length; i++) {
-            var whiteListIp = new IPCheck(ipAddresses[i]);
-            if (ip.match(whiteListIp)) {
-                console.log('I got a match');
-                return true;
-            }
-        }
-    }
+    var matcher = new CIDRMatcher(ipAddresses);
     
+    for(var j=0; j <= ipToCheck.split(",").length; j++){
+        console.log('Validating: ' + ipToCheck.split(","));
+        if(matcher.contains(ipToCheck.split(",").trim())){
+            console.log('I got a match');
+            return true;
+        }
     return false;
 }
 
