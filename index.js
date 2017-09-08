@@ -53,7 +53,7 @@ function checkIp(ipToCheck, ipAddresses) {
     console.log('Searching ' + ipToCheck + ' in ' + ipAddresses);
     var matcher = new CIDRMatcher(ipAddresses);
     
-    for(var j=0; j <= ipToCheck.split(",").length; j++){
+    for(var j=0; j < ipToCheck.split(",").length; j++){
         console.log('Validating: ' + ipToCheck.split(","));
         if(matcher.contains(ipToCheck.split(",").trim())){
             console.log('I got a match');
