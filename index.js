@@ -59,6 +59,7 @@ function checkIp(ipToCheck, ipAddresses) {
             console.log('I got a match');
             return true;
         }
+    }
     return false;
 }
 
