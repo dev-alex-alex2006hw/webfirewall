@@ -50,13 +50,13 @@ const PopulationStrategies = {
 
 function checkIp(ipToCheck, ipAddresses) {
     
-    console.log('Searching ' + ipToCheck + ' in ' + ipAddresses);
+    // console.log('Searching ' + ipToCheck + ' in ' + ipAddresses);
     var matcher = new CIDRMatcher(ipAddresses);
     
     for(var j=0; j < ipToCheck.split(",").length; j++){
-        console.log('Validating: ' + ipToCheck.split(",")[j].trim());
+        // console.log('Validating: ' + ipToCheck.split(",")[j].trim());
         if(matcher.contains(ipToCheck.split(",")[j].trim())){
-            console.log('I got a match');
+            // console.log('I got a match');
             return true;
         }
     }
@@ -122,14 +122,11 @@ module.exports = (config) => {
                         checkIp(ipAddress,rule.ipAddresses)){
                         switch (rule.action.toUpperCase()) {
                             case 'ACCEPT':
-                                console.log('accepted');
+                                //console.log('accepted');
                                 next();
                                 break;
                             case 'DROP':
-                                // let err = new Error();
-                                // err.statusCode = 410;
-                                console.log('dropped');
-
+                                //console.log('dropped');
                                 res.send(410);
                                 next(false);
 
@@ -144,13 +141,11 @@ module.exports = (config) => {
             switch (config.defaultAction) {
                 case 'ACCEPT':
                     next();
-                    console.log('ACCEPTED');
+                    // console.log('ACCEPTED');
 
                     break;
                 case 'DROP':
-                    // let err = new Error();
-                    // err.statusCode = 410;
-                    console.log('DROPPED');
+                    // console.log('DROPPED');
 
                     res.send(410);
                     next(false);
