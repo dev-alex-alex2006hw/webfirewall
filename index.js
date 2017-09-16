@@ -3,7 +3,7 @@ const co = require('co');
 // const IPCheck = require('ipcheck');
 const CIDRMatcher = require('cidr-matcher');
 const net = require('net');
-
+let config = null;
 
 const PopulationStrategies = {
     'express': {
@@ -37,14 +37,30 @@ const PopulationStrategies = {
             return req.headers['origin'] || '';
         },
         getIpAddress: (req, res) => {
-        var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-        if (ip === '::1') {
-            return '127.0.0.1';
+            var ip = '';
+            if (config.checkXForwardedForIndex != null){
+                if ( req.headers['x-forwarded-for'] != null){
+                    var ary =  req.headers['x-forwarded-for'].split(',');
+                    if (ary && ary.length && ary.length > config.checkXForwardedForIndex ){
+                        if (config.checkXForwardedForIndex == -1){
+                            ip = ary[ary.length-1];
+                        }else{
+                            ip = ary[config.checkXForwardedForIndex];
+                        }
+                    }
+                }
+            }else{
+                ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+            }
+       
+            if (ip === '::1') {
+                return '127.0.0.1';
+            }
+            if (net.isIP(ip) === 6) {
+                return ip.substring(7);
+            }
+            return ip;        
         }
-        if (net.isIP(ip) === 6) {
-            return ip.substring(7);
-        }
-        return ip;        }
     }
 }
 
@@ -89,7 +105,8 @@ function emptyfn() {
     return Promise.resolve(true);
 }
 
-module.exports = (config) => {
+module.exports = (cfg) => {
+    config = cfg;
     config.defaultAction = (config.defaultAction || 'DROP').toUpperCase();
     for (let rule of config.rules) {
         rule.origin = rule.origin || ['*'];
