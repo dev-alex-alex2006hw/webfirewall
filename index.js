@@ -42,8 +42,8 @@ const PopulationStrategies = {
                 if ( req.headers['x-forwarded-for'] != null){
                     var ary =  req.headers['x-forwarded-for'].split(',');
                     if (ary && ary.length && ary.length > config.checkXForwardedForIndex ){
-                        if (config.checkXForwardedForIndex == -1){
-                            ip = ary[ary.length-1];
+                        if (config.checkXForwardedForIndex < 0 ){
+                            ip = ary[ary.length + config.checkXForwardedForIndex];
                         }else{
                             ip = ary[config.checkXForwardedForIndex];
                         }
